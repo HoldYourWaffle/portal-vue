@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { VNode, PropOptions } from 'vue'
 import { combinePassengers } from '@/utils'
-import { Transport, PropWithComponent } from '../types'
+import { Transport, PropWithComponent, Transports } from '@/types'
 
 import { wormhole } from '@/components/wormhole'
 
@@ -19,17 +19,26 @@ export default Vue.extend({
   },
   data() {
     return {
-      transports: wormhole.transports,
       firstRender: true,
+
+      // Configurable source to allow mocking in tests
+      transportsSource: wormhole.transports,
+
+      // Transports are copied in here only when not suspended, reactivity is based on this field
+      transportsBuffer: {} as Transports,
     }
   },
   created() {
+    // Initial transport loading, can't do in data() because transportsSource can be overriden
+    this.loadTransports()
+
     this.$nextTick(() => {
       wormhole.registerTarget(this.name, this)
     })
   },
   watch: {
     ownTransports() {
+      // TODO can I not emit on the 'initialization' call to avoid the async issues in tests?
       this.$emit('change', this.children().length > 0)
     },
     name(newVal, oldVal) {
@@ -39,6 +48,10 @@ export default Vue.extend({
        */
       wormhole.unregisterTarget(oldVal)
       wormhole.registerTarget(newVal, this)
+    },
+    transportsSource() {
+      // TODO check for suspension
+      this.loadTransports()
     },
   },
   mounted() {
@@ -55,7 +68,7 @@ export default Vue.extend({
 
   computed: {
     ownTransports(): Transport[] {
-      const transports: Transport[] = this.transports[this.name] || []
+      const transports: Transport[] = this.transportsBuffer[this.name] || []
       if (this.multiple) {
         return transports
       }
@@ -67,6 +80,9 @@ export default Vue.extend({
   },
 
   methods: {
+    loadTransports(): void {
+      this.transportsBuffer = this.transportsSource
+    },
     // can't be a computed prop because it has to "react" to $slot changes.
     children(): VNode[] {
       return this.passengers.length !== 0
@@ -76,7 +92,7 @@ export default Vue.extend({
         : this.$slots.default || []
     },
     // can't be a computed prop because it has to "react" to this.children().
-    noWrapper() {
+    noWrapper(): boolean {
       const noWrapper = this.slim && !this.transition
       if (noWrapper && this.children().length > 1) {
         console.warn(

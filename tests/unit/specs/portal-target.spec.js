@@ -12,7 +12,7 @@ function createWrapper(props = {}, options = {}) {
   return mount(PortalTarget, {
     data() {
       return {
-        transports: Wormhole.transports,
+        transportsSource: Wormhole.transports,
         firstRender: true,
       }
     },
@@ -94,7 +94,9 @@ describe('PortalTarget', function() {
     ])
 
     return Vue.nextTick().then(() => {
-      expect(wrapper.emitted().change[0][0]).toBe(true)
+      // Check the last fired change event, initialization *might* have fired one as well
+      const change = wrapper.emitted().change
+      expect(change[change.length - 1][0]).toBe(true)
     })
   })
 
@@ -121,14 +123,18 @@ describe('PortalTarget', function() {
     return wrapper.vm
       .$nextTick()
       .then(() => {
-        expect(wrapper.emitted().change[0][0]).toEqual(true)
+        // Check the last fired change event, initialization *might* have fired one as well
+        const change = wrapper.emitted().change
+        expect(change[change.length - 1][0]).toBe(true)
 
         Wormhole.transports['target'] = newerTransports
 
         return wrapper.vm.$nextTick()
       })
       .then(() => {
-        expect(wrapper.emitted().change[1][0]).toEqual(true)
+        // Check the last fired change event, initialization *might* have fired one as well
+        const change = wrapper.emitted().change
+        expect(change[change.length - 1][0]).toBe(true)
       })
   })
 
