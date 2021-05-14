@@ -1,0 +1,11 @@
+/*
+        TODO concept:
+            We suspend the portal-target, i.e. it won't update unless you tell it to (prop/event?)
+            This means that the target no longer receives updates from the wormhole
+            The wormhole still handles everything, it's just not reflected in the UI
+
+        TODO instead of a direct data-coupling, have an intermediate buffer that's updated by a watcher
+            Watch womhole.transports, when changed, check suspend, if not, update buffer
+            The buffer might have to be set to a (deep?) copy of the transports, otherwise things might still inadvertadly get reactive
+              (For example when the wormhole is changing things internally)
+*/

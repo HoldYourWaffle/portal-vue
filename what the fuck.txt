@@ -1,0 +1,76 @@
+/*
+        FIXME WHAT THE FUCK IS GOING ON HERE
+          The main problem is that the initial loadTransports inside the created hook *sometimes* creates an extra emit event
+          However, *somehow* it only creates this event when at least one other test has run
+          WHY?????
+          It should be a completely new component
+          I guess it makes sense that the watcher *is* fired in create, because we're loading things
+          But why is this skipped when another test has run?
+*/
+
+
+
+
+> Test X
+S46	Start of test
+S47	Set Wormhole.transports
+S54	Create wrapper
+	P85	Calculate ownTransports
+	P45	created, initial loadTransports
+	P116	Load transportsBuffer
+	P85	Recalculate ownTransports (tB dep)
+S55	Assert something
+X	P53	Emit ownTransports change
+		Stactraced to P45/create (async order?)
+
+> Test emit
+S85	Create wrapper
+	P85	Calculate ownTransports
+	P45	created, initial loadTransports
+	P116	Load transportsBuffer
+	P85	Recalculate ownTransports (tB dep)
+
+{EXT	P53	Emit ownTransports change
+		Stacktraced to P45/create		}
+
+S98	Set Wormhole.transports
+	P85	Recalculate ownTransports (???)
+	P53	Emit ownTransports change
+	P63	Emit transportsSource change (???)
+		P66	Load transports
+		P116	Load transportsBuffer
+
+
+
+
+
+
+
+
+> Test emit
+S85	Create wrapper
+	P85	Calculate ownTransports
+	P45	created, initial loadTransports
+	P116	Load transportsBuffer
+	P85	Recalculate ownTransports (tB dep)
+
+{MISS	P53	Emit ownTransports change		}
+
+S98	Set Wormhole.transports
+	P85	Recalculate ownTransports (???)
+	P53	Emit ownTransports change
+	P63	Emit transportsSource change (???)
+		P66	Load transports
+		P116	Load transportsBuffer
+
+
+
+
+
+
+
+The division is in vue.common.dev.js@4356/4357/4360
+With a single test config.async is true, with more it's false, at least during the second test
+
+I suppose the ownTransports mutation and corresponding watcher-fire is deduped by Vue in non-async mode.
+That might be why the 'first one' from the initial loadTransports in create doesn't fire

@@ -16,10 +16,13 @@ export default Vue.extend({
     transition: { type: [String, Object, Function] } as PropOptions<
       PropWithComponent
     >,
+    suspended: { type: Boolean, default: false },
   },
   data() {
     return {
       firstRender: true,
+
+      test: { a: true, b: { c: 0 } },
 
       // Configurable source to allow mocking in tests
       transportsSource: wormhole.transports,
@@ -50,8 +53,14 @@ export default Vue.extend({
       wormhole.registerTarget(newVal, this)
     },
     transportsSource() {
-      // TODO check for suspension
-      this.loadTransports()
+      console.log('aaa')
+      //FIXME this is called only once????
+
+      if (!this.suspended) {
+        // We're not suspended, load the changed source
+        this.loadTransports()
+      }
+      // Otherwise transportsBuffer stays intact, therefore no re-render
     },
   },
   mounted() {
@@ -80,7 +89,32 @@ export default Vue.extend({
   },
 
   methods: {
+    // can't be a computed prop because loading is done deliberately, sometimes the old state stays
     loadTransports(): void {
+      console.log('reloading buffer')
+      /*
+        TODO this needs to be a half-deep copy:
+          For every key in the source...
+          Copy the array value...
+          ...into the buffer...
+          ...at that key
+       */
+
+      console.log(Object.keys(this.transportsSource))
+      console.log(this.transportsSource)
+
+      /*console.log(Object.keys(wormhole.transports))
+      console.log(wormhole.transports)
+
+      console.log(Object.keys(this.test))
+      console.log(this.test)*/
+
+      for (let k in this.transportsSource) {
+        console.log(k)
+      }
+
+      console.log(Object.getOwnPropertyDescriptors(this.transportsSource))
+
       this.transportsBuffer = this.transportsSource
     },
     // can't be a computed prop because it has to "react" to $slot changes.

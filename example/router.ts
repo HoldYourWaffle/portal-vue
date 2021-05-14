@@ -16,6 +16,9 @@ import EmptyPortal from './components/empty-portal/index.vue'
 import DefaultSlotContent from './components/default-content-on-target/index.vue'
 import Transitions from './components/transitions/transitions.vue'
 import Multiple from './components/multiple/multiple.vue'
+import Suspend from './components/suspend/index.vue'
+import SuspendA from './components/suspend/a.vue'
+import SuspendB from './components/suspend/b.vue'
 
 Vue.use(VueRouter)
 
@@ -79,6 +82,14 @@ const routes = [
   {
     path: '/multiple',
     component: Multiple,
+  },
+  {
+    path: '/suspend',
+    component: Suspend,
+    children: [
+      { path: 'a', component: SuspendA },
+      { path: 'b', component: SuspendB },
+    ],
   },
 ]
 
