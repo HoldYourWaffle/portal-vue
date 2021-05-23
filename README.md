@@ -17,6 +17,11 @@ For more detailed documentation and additional Information, [please visit the do
 
 > Looking for version 1.\*? [Docs for version 1 are here](https://v1.portal-vue.linusb.org)
 
+## In this fork...
+Upstream pull requests [#340](https://github.com/LinusBorg/portal-vue/pull/340) and [#341](https://github.com/LinusBorg/portal-vue/pull/341) have been merged.
+
+This adds a new `suspension` property to `<portal-target>`, which _suspends_ all teleportation as long as its value is `true`.
+
 ## Installation
 
 ```bash
