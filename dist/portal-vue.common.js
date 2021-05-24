@@ -1,6 +1,6 @@
 
  /*! 
-  * portal-vue © Thorsten Lünborg, 2019 
+  * portal-vue © Thorsten Lünborg, 2021 
   * 
   * Version: 2.1.7
   * 
@@ -350,6 +350,10 @@ var PortalTarget = Vue.extend({
     },
     transition: {
       type: [String, Object, Function]
+    },
+    suspended: {
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -408,7 +412,14 @@ var PortalTarget = Vue.extend({
   methods: {
     // can't be a computed prop because it has to "react" to $slot changes.
     children: function children() {
-      return this.passengers.length !== 0 ? this.passengers : this.$scopedSlots.default ? this.$scopedSlots.default(this.slotProps) : this.$slots.default || [];
+      var self = this.children;
+
+      if (!this.suspended || self.childrenCache == null) {
+        // Recalculate children only if the cache is empty or if not suspended
+        self.childrenCache = this.passengers.length !== 0 ? this.passengers : this.$scopedSlots.default ? this.$scopedSlots.default(this.slotProps) : this.$slots.default || [];
+      }
+
+      return self.childrenCache;
     },
     // can't be a computed prop because it has to "react" to this.children().
     noWrapper: function noWrapper() {
