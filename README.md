@@ -25,17 +25,37 @@ This adds a new `suspension` property to `<portal-target>`, which _suspends_ all
 ## Installation
 
 ```bash
-npm i portal-vue
+npm i @holdyourwaffle/portal-vue
 
 # or
 
-yarn add portal-vue
+yarn add @holdyourwaffle/portal-vue
 ```
 
+```javascript
+import PortalVue from '@holdyourwaffle/portal-vue'
+Vue.use(PortalVue)
+```
+
+
+### Transitive dependencies
+
+If you're using [bootstrap-vue](https://bootstrap-vue.org/) or another library that has `portal-vue` as a transitive dependency, you might prefer installing this fork with a Git dependency instead:
+
+```bash
+npm i git://github.com/HoldYourWaffle/portal-vue.git#suspension-built
+
+# or
+
+yarn add git://github.com/HoldYourWaffle/portal-vue.git#suspension-built
+```
+
+This keeps the module under the standard `portal-vue` name, allowing NPM to de-dupe the (unforked) transitive dependency.
 ```javascript
 import PortalVue from 'portal-vue'
 Vue.use(PortalVue)
 ```
+
 
 ## Usage
 
@@ -55,7 +75,15 @@ Vue.use(PortalVue)
 
 ## Nuxt module
 
-Add `portal-vue/nuxt` to modules section of `nuxt.config.js`
+Add `@holdyourwaffle/portal-vue/nuxt` to modules section of `nuxt.config.js`
+
+```javascript
+{
+  modules: ['@holdyourwaffle/portal-vue/nuxt']
+}
+```
+
+Or when using a Git dependency:
 
 ```javascript
 {
