@@ -370,9 +370,6 @@ var PortalTarget = Vue.extend({
     });
   },
   watch: {
-    ownTransports: function ownTransports() {
-      this.$emit('change', this.children().length > 0);
-    },
     name: function name(newVal, oldVal) {
       /**
        * TODO
@@ -415,8 +412,13 @@ var PortalTarget = Vue.extend({
       var self = this.children;
 
       if (!this.suspended || self.childrenCache == null) {
-        // Recalculate children only if the cache is empty or if not suspended
+        var initialCaching = self.childrenCache == null; // Recalculate children only if the cache is empty or if not suspended
+
         self.childrenCache = this.passengers.length !== 0 ? this.passengers : this.$scopedSlots.default ? this.$scopedSlots.default(this.slotProps) : this.$slots.default || [];
+
+        if (!initialCaching) {
+          this.$emit('change', self.childrenCache.length > 0);
+        }
       }
 
       return self.childrenCache;
