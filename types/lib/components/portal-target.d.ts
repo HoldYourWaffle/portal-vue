@@ -17,5 +17,6 @@ declare const _default: import("vue").VueConstructor<{
     slotProps: any;
     tag: string;
     transition: PropWithComponent;
+    suspended: boolean;
 } & Vue>;
 export default _default;
